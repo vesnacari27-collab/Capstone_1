@@ -1,0 +1,47 @@
+-- Vesna Cari 
+-- The sales territory i am analyzing is Maine in the Northeast region. 
+USE sample_sales; 
+-- What is total revenue overall for sales in the assigned territory plus the start date and end date that tel you what period that data covers?
+-- Maine brought in about $1.88 mllion in total revenue. The data runs from January 1, 2022 to December 31, 2025 which covers all 4 years. 
+-- What is the month by month revenue breakdown for the sales territory? 
+-- Revenue in 2022 started at $15-25K a month and grew steadily over the years especially in 2025 when it went up to $45-65K. Overall the trend is high in the mid-year but with some slow months in the winter. 
+-- Provide a comparison of total revenue for the specific sales territory and the region it belongs to. 
+-- Maine is part of the Northeast region including other states such as Maryland, Massachusetts, and New Jersey. The Northeast regions had around $24.4 million in total revenue and Main was a part of it at $11.45 million in revenue. That's around 7.7% so Maine still has room to grow in comparison to its neighboring states. 
+-- What is the number of transactions per month and average transaction size by product categor for the sales territory? 
+-- Technology and accessories are at the top with around 2,848 transactions with an average sale of $477. Textbooks are the second top transactions with an average sale of $172. Stationary and apparel have a lot of transactions but the average sales are pretty low around $10-32. 
+-- Can you provide a ranking of in-store sales performance by each store in the sales territory, or a ranking of online sales performance by state within an online sales territory? 
+-- For the ranking of in-store sales performance by South Portland it's the top performing store with the highest revenue at $332K. Orono and Kennebunkport are the next in ranking while Bangor and Bar Harbor are at the bottom of the ranking. For Bar Harbor especially they have a great number of trnasactions however customers are coming in and not spending as much per visit compared to the other stores. 
+-- What is your recommendation for where to focus sales attention in the next quarter? 
+-- A recommendation for where to focus next quarter would be for underperforming stores like bar Harbor they should focus on getting their customers to complete more pruchases rather than focusing on the numbers of customers visiting their store. Textbooks are a great focus to work on as well especially since semesters are always beginning at different quarters. Another recommendation is laptops and accessories are the biggest opportunities for generating the most revenue so it's great to lean into this as well. 
+-- For each question, write a query to perform an analysis of the data that can answer that question. You may choose to write more than one query to help get to a particular answerFor the question seeking a recommendation of where to focus sales attention in the next quarter, use what you have discovered so far with the rest of your analysis (and optionally any additional queries that you would like to explore), and write a comment in your script explaining what your recommendation is and why. 
+-- ============================================================
+-- QUESTION 6
+-- Recommendation for where to focus sales attention
+-- in the next quarter.
+--
+-- RECOMMENDATION:
+-- Focus Q1 2026 attention on three things:
+--
+-- 1. TECHNOLOGY (highest priority) — Technology & Accessories
+--    generates 72% of Maine's total revenue at an average of
+--    $477 per transaction. Laptops are the top-selling items.
+--    Promoting higher-ticket tech SKUs (laptops, docking
+--    stations, headphones) will have the biggest impact on
+--    total revenue with the fewest transactions needed.
+-- 2. TEXTBOOKS (time-sensitive) — Q1 (Jan–Mar) is the peak
+--    semester-start buying window. Textbooks average $172 per
+--    transaction but are under-indexed in transaction count
+--    relative to their revenue potential. Stores near college
+--    campuses — especially Orono (University of Maine) and
+--    Lewiston — should run targeted promotions at semester
+--    start to capture this seasonal demand.
+--
+-- 3. BAR HARBOR (underperforming store) — Bar Harbor has the
+--    2nd highest transaction count in the territory (2,230)
+--    but the lowest average transaction size ($128.90), which
+--    puts it last in total revenue. The gap vs the top store
+--    (South Portland, $151.26 avg) suggests customers are
+--    coming in but not buying high-value items. Stocking and
+--    promoting more tech and textbooks at Bar Harbor could
+--    lift its revenue significantly without needing more
+--    foot traffic.
