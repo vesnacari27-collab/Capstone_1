@@ -1,47 +1,159 @@
--- Vesna Cari 
--- The sales territory i am analyzing is Maine in the Northeast region. 
-USE sample_sales; 
--- What is total revenue overall for sales in the assigned territory plus the start date and end date that tel you what period that data covers?
--- Maine brought in about $1.88 mllion in total revenue. The data runs from January 1, 2022 to December 31, 2025 which covers all 4 years. 
--- What is the month by month revenue breakdown for the sales territory? 
--- Revenue in 2022 started at $15-25K a month and grew steadily over the years especially in 2025 when it went up to $45-65K. Overall the trend is high in the mid-year but with some slow months in the winter. 
--- Provide a comparison of total revenue for the specific sales territory and the region it belongs to. 
--- Maine is part of the Northeast region including other states such as Maryland, Massachusetts, and New Jersey. The Northeast regions had around $24.4 million in total revenue and Main was a part of it at $11.45 million in revenue. That's around 7.7% so Maine still has room to grow in comparison to its neighboring states. 
--- What is the number of transactions per month and average transaction size by product categor for the sales territory? 
--- Technology and accessories are at the top with around 2,848 transactions with an average sale of $477. Textbooks are the second top transactions with an average sale of $172. Stationary and apparel have a lot of transactions but the average sales are pretty low around $10-32. 
--- Can you provide a ranking of in-store sales performance by each store in the sales territory, or a ranking of online sales performance by state within an online sales territory? 
--- For the ranking of in-store sales performance by South Portland it's the top performing store with the highest revenue at $332K. Orono and Kennebunkport are the next in ranking while Bangor and Bar Harbor are at the bottom of the ranking. For Bar Harbor especially they have a great number of trnasactions however customers are coming in and not spending as much per visit compared to the other stores. 
--- What is your recommendation for where to focus sales attention in the next quarter? 
--- A recommendation for where to focus next quarter would be for underperforming stores like bar Harbor they should focus on getting their customers to complete more pruchases rather than focusing on the numbers of customers visiting their store. Textbooks are a great focus to work on as well especially since semesters are always beginning at different quarters. Another recommendation is laptops and accessories are the biggest opportunities for generating the most revenue so it's great to lean into this as well. 
--- For each question, write a query to perform an analysis of the data that can answer that question. You may choose to write more than one query to help get to a particular answerFor the question seeking a recommendation of where to focus sales attention in the next quarter, use what you have discovered so far with the rest of your analysis (and optionally any additional queries that you would like to explore), and write a comment in your script explaining what your recommendation is and why. 
 -- ============================================================
--- QUESTION 6
--- Recommendation for where to focus sales attention
--- in the next quarter.
---
--- RECOMMENDATION:
--- Focus Q1 2026 attention on three things:
---
--- 1. TECHNOLOGY (highest priority) — Technology & Accessories
---    generates 72% of Maine's total revenue at an average of
---    $477 per transaction. Laptops are the top-selling items.
---    Promoting higher-ticket tech SKUs (laptops, docking
---    stations, headphones) will have the biggest impact on
---    total revenue with the fewest transactions needed.
--- 2. TEXTBOOKS (time-sensitive) — Q1 (Jan–Mar) is the peak
---    semester-start buying window. Textbooks average $172 per
---    transaction but are under-indexed in transaction count
---    relative to their revenue potential. Stores near college
---    campuses — especially Orono (University of Maine) and
---    Lewiston — should run targeted promotions at semester
---    start to capture this seasonal demand.
---
--- 3. BAR HARBOR (underperforming store) — Bar Harbor has the
---    2nd highest transaction count in the territory (2,230)
---    but the lowest average transaction size ($128.90), which
---    puts it last in total revenue. The gap vs the top store
---    (South Portland, $151.26 avg) suggests customers are
---    coming in but not buying high-value items. Stocking and
---    promoting more tech and textbooks at Bar Harbor could
---    lift its revenue significantly without needing more
---    foot traffic.
+-- Sales Analysis: Maine In-Store Territory
+-- Analyst: [Your Last Name]
+-- Database: sample_sales
+-- ============================================================
+
+USE sample_sales;
+
+-- ============================================================
+-- QUESTION 1: Total revenue, start date, and end date
+-- for the Maine in-store sales territory
+-- ============================================================
+
+SELECT
+    SUM(ss.Sale_Amount)      AS Total_Revenue,
+    MIN(ss.Transaction_Date) AS Start_Date,
+    MAX(ss.Transaction_Date) AS End_Date
+FROM store_sales ss
+JOIN store_locations sl ON ss.Store_ID = sl.StoreId
+WHERE sl.State = 'Maine';
+
+
+-- ============================================================
+-- QUESTION 2: Month-by-month revenue breakdown for Maine
+-- ============================================================
+
+SELECT
+    YEAR(ss.Transaction_Date)                  AS Year,
+    MONTH(ss.Transaction_Date)                 AS Month_Num,
+    DATE_FORMAT(ss.Transaction_Date, '%M %Y')  AS Month,
+    SUM(ss.Sale_Amount)                        AS Monthly_Revenue
+FROM store_sales ss
+JOIN store_locations sl ON ss.Store_ID = sl.StoreId
+WHERE sl.State = 'Maine'
+GROUP BY
+    YEAR(ss.Transaction_Date),
+    MONTH(ss.Transaction_Date),
+    DATE_FORMAT(ss.Transaction_Date, '%M %Y')
+ORDER BY
+    YEAR(ss.Transaction_Date),
+    MONTH(ss.Transaction_Date);
+
+
+-- ============================================================
+-- QUESTION 3: Comparison of Maine territory revenue
+-- vs. total revenue for its region
+-- ============================================================
+
+-- First, find Maine's region from the management table
+SELECT DISTINCT Region
+FROM management
+WHERE State = 'Maine';
+
+-- Revenue comparison: Maine vs its region
+SELECT
+    m.Region,
+    SUM(CASE WHEN sl.State = 'Maine' THEN ss.Sale_Amount ELSE 0 END) AS Maine_Revenue,
+    SUM(ss.Sale_Amount)                                                AS Region_Revenue,
+    ROUND(
+        SUM(CASE WHEN sl.State = 'Maine' THEN ss.Sale_Amount ELSE 0 END)
+        / SUM(ss.Sale_Amount) * 100, 2
+    )                                                                  AS Maine_Pct_Of_Region
+FROM store_sales ss
+JOIN store_locations sl ON ss.Store_ID = sl.StoreId
+JOIN management m ON sl.State = m.State
+WHERE m.Region = (SELECT Region FROM management WHERE State = 'Maine' LIMIT 1)
+GROUP BY m.Region;
+
+
+-- ============================================================
+-- QUESTION 4: Number of transactions per month and average
+-- transaction size by product category for Maine
+-- ============================================================
+
+SELECT
+    YEAR(ss.Transaction_Date)                  AS Year,
+    MONTH(ss.Transaction_Date)                 AS Month_Num,
+    DATE_FORMAT(ss.Transaction_Date, '%M %Y')  AS Month,
+    ic.Category,
+    COUNT(ss.id)                               AS Num_Transactions,
+    ROUND(AVG(ss.Sale_Amount), 2)              AS Avg_Transaction_Size
+FROM store_sales ss
+JOIN store_locations sl       ON ss.Store_ID = sl.StoreId
+JOIN products p               ON ss.Prod_Num = p.ProdNum
+JOIN inventory_categories ic  ON p.Categoryid = ic.Categoryid
+WHERE sl.State = 'Maine'
+GROUP BY
+    YEAR(ss.Transaction_Date),
+    MONTH(ss.Transaction_Date),
+    DATE_FORMAT(ss.Transaction_Date, '%M %Y'),
+    ic.Category
+ORDER BY
+    YEAR(ss.Transaction_Date),
+    MONTH(ss.Transaction_Date),
+    ic.Category;
+
+
+-- ============================================================
+-- QUESTION 5: Ranking of in-store sales performance
+-- by each store in Maine
+-- ============================================================
+
+SELECT
+    sl.StoreId,
+    sl.StoreLocation,
+    sl.State,
+    SUM(ss.Sale_Amount)           AS Total_Revenue,
+    COUNT(ss.id)                  AS Total_Transactions,
+    ROUND(AVG(ss.Sale_Amount), 2) AS Avg_Sale,
+    RANK() OVER (ORDER BY SUM(ss.Sale_Amount) DESC) AS Revenue_Rank
+FROM store_sales ss
+JOIN store_locations sl ON ss.Store_ID = sl.StoreId
+WHERE sl.State = 'Maine'
+GROUP BY sl.StoreId, sl.StoreLocation, sl.State
+ORDER BY Revenue_Rank;
+
+
+-- ============================================================
+-- QUESTION 6: Recommendation for next quarter sales focus
+-- =========================
+/*
+RECOMMENDATION:
+Based on the analysis of Maine in-store sales (2022–2025), the following
+actions are recommended for next quarter:
+
+1. FOCUS ON BAR HARBOR (lowest ranked store):
+   Bar Harbor ranks last in both total revenue ($287,452) and average
+   transaction size ($128.90), despite having 2,230 transactions —
+   the second highest transaction count. This means customers are
+   coming in but spending less. A targeted upselling strategy,
+   particularly around high-value categories like Technology &
+   Accessories and Textbooks, could significantly boost revenue
+   without needing to increase foot traffic.
+
+2. LEVERAGE TECHNOLOGY & ACCESSORIES:
+   With an average transaction size of $257+, Technology & Accessories
+   is by far the highest-value category. Ensuring strong inventory
+   and prominent placement of tech products across all Maine stores —
+   especially in lower-performing locations like Bar Harbor and
+   Bangor — should be a priority.
+
+3. CAPITALIZE ON SEASONAL PEAKS:
+   January is consistently the weakest month (e.g., $15,700 in Jan 2022).
+   A post-holiday promotion in January targeting Textbooks (back to
+   semester) and Stationery could help offset this seasonal dip.
+   June shows strong performance and should be supported with
+   adequate inventory heading into summer.
+
+4. MAINTAIN SOUTH PORTLAND AND ORONO:
+   The top two stores (South Portland and Orono) are performing well
+   and are close in revenue. Continue supporting them with strong
+   inventory levels. Orono's high transaction count (2,250) suggests
+   strong foot traffic — focus on increasing average sale there.
+
+5. REGIONAL CONTEXT:
+   Maine represents 7.75% of Northeast region revenue. There is room
+   to grow this share, particularly through the upselling and
+   seasonal strategies outlined above.
+*/
