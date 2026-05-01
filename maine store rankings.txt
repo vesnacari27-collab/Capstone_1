@@ -1,6 +1,0 @@
-823	South Portland	Maine	332611.76	2199	151.26	1
-822	Orono	Maine	330505.47	2250	146.89	2
-820	Kennebunkport	Maine	321998.55	2253	142.92	3
-821	Lewiston	Maine	303761.91	2155	140.96	4
-818	Bangor	Maine	300919.98	2156	139.57	5
-819	Bar Harbor	Maine	287452.08	2230	128.90	6
